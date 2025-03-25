@@ -1,0 +1,288 @@
+/* Import fonts and styles first */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+@import '@wallet-ui/tailwind/index.css';
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Basic styles */
+body {
+  color: white;
+  /* overflow: hidden; */
+  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+  margin: 0;
+  padding: 0;
+  font-family: 'Orbitron', sans-serif;
+}
+
+html {
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Layout classes */
+.h-screen {
+  height: 100vh;
+}
+
+.w-screen {
+  width: 100vw;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+/* Navigation styles */
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  transform: translateY(-1px);
+}
+
+.nav-link:active {
+  transform: translateY(0.25rem);
+}
+
+/* Component classes */
+.cosmic-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(to right, #9f54ff, #0b80ff);
+  color: white;
+  font-weight: 500;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(153, 0, 255, 0.5);
+}
+
+.cosmic-btn:hover {
+  box-shadow: 0 0 20px rgba(153, 0, 255, 0.8);
+}
+
+.cosmic-btn:active {
+  transform: translateY(0.25rem);
+  box-shadow: 0 0 5px rgba(153, 0, 255, 0.5);
+}
+
+.cosmic-btn-alt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(to right, #06ed3a, #0b80ff);
+  color: white;
+  font-weight: 500;
+  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+}
+
+.cosmic-btn-alt:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 153, 0.8);
+}
+
+.cosmic-btn-alt:active {
+  transform: translateY(0.25rem);
+  box-shadow: 0 0 5px rgba(0, 255, 153, 0.5);
+}
+
+.cosmic-input {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(11, 128, 255, 0.5);
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  outline: none;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+.cosmic-input:focus {
+  border-color: rgb(11, 128, 255);
+  box-shadow: 0 0 0 1px rgb(11, 128, 255);
+}
+
+.cosmic-panel {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(11, 128, 255, 0.3);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 0 15px rgba(0, 115, 255, 0.2);
+}
+
+.cosmic-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  background: linear-gradient(to right, #d0b0ff, #7ec2ff, #76ff95);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: pulse-glow 3s infinite;
+}
+
+/* Text colors */
+.text-white {
+  color: white;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+.text-cosmic-green-500 {
+  color: #06ed3a;
+}
+
+.text-cosmic-blue-200 {
+  color: #baddff;
+}
+
+/* Font styles */
+.font-game {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.font-futuristic {
+  font-family: 'Orbitron', sans-serif;
+}
+
+.font-handwritten {
+  font-family: 'Kalam', cursive;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* Flexbox */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-8 {
+  gap: 2rem;
+}
+
+/* Text sizing */
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-5xl {
+  font-size: 3rem;
+}
+
+.sm\:text-7xl {
+  font-size: 4.5rem;
+}
+
+.sm\:text-2xl {
+  font-size: 1.5rem;
+}
+
+/* Spacing */
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.p-6 {
+  padding: 1.5rem;
+}
+
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Star animation */
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle var(--duration) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; }
+  50% { opacity: var(--opacity); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { text-shadow: 0 0 5px rgba(153, 0, 255, 0.7), 0 0 10px rgba(153, 0, 255, 0.5); }
+  50% { text-shadow: 0 0 15px rgba(153, 0, 255, 0.9), 0 0 20px rgba(153, 0, 255, 0.7); }
+}
+
+/* Utility classes */
+.text-shadow-glow {
+  text-shadow: 0 0 5px rgba(153, 0, 255, 0.7), 0 0 10px rgba(153, 0, 255, 0.5);
+}
+
+.border-glow {
+  box-shadow: 0 0 5px rgba(0, 115, 255, 0.7), 0 0 10px rgba(0, 115, 255, 0.5);
+}
+
+.text-center {
+  text-align: center;
+}
