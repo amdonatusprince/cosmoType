@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GameMode } from '../contexts/GameContext';
 import { TypingStats } from '../hooks/useStatsTracking';
 import { WalletUiDropdown } from '@wallet-ui/react';
@@ -28,14 +28,19 @@ const GameOver = ({
   onExit
 }: GameOverProps) => {
   const [showStats, setShowStats] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Show detailed stats after a delay
+  // Show detailed stats after component mounts
   useEffect(() => {
+    setMounted(true);
     const timer = setTimeout(() => {
       setShowStats(true);
-    }, 800);
+    }, 1000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setMounted(false);
+    };
   }, []);
 
   // Get performance messages
@@ -77,6 +82,10 @@ const GameOver = ({
         when: "beforeChildren",
         staggerChildren: 0.1
       }
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.3 }
     }
   };
 
@@ -99,132 +108,134 @@ const GameOver = ({
   };
 
   return (
+    <AnimatePresence>
+      {mounted && (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="cosmic-panel w-full sm:w-[800px] lg:w-[1000px] p-6 sm:p-8"
+            className="cosmic-panel w-full sm:w-[800px] lg:w-[1000px] p-6 sm:p-8"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
+            exit="exit"
       >
-        <motion.div variants={itemVariants} className="text-center">
-          <h2 className="cosmic-title text-3xl sm:text-4xl lg:text-5xl font-bold">
+            {/* Score section */}
+            <motion.div variants={itemVariants} className="text-center">
+              <h2 className="cosmic-title text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
             {gameMode === 'tranquility' ? 'Journey Complete' : 'Game Over'}
           </h2>
 
           {isHighScore && (
-            <motion.span
-              className="inline-block bg-gradient-to-r from-yellow-300 to-amber-500 text-transparent bg-clip-text font-bold text-xl sm:text-2xl mt-2"
-              initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                repeatType: 'reverse'
-              }}
-            >
-              New High Score!
-            </motion.span>
+                <motion.div
+                  className="mt-2"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <span className="inline-block bg-gradient-to-r from-yellow-300 to-amber-500 text-transparent bg-clip-text font-bold text-xl sm:text-2xl">
+                New High Score!
+                  </span>
+                </motion.div>
           )}
-        </motion.div>
 
         <motion.div
-          className="mt-4"
+                className="mt-6"
           variants={itemVariants}
         >
-          <div className="text-center">
             <motion.p
-              className="text-5xl sm:text-6xl lg:text-7xl font-bold"
+                  className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-2"
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 10 }}
             >
               {score}
             </motion.p>
-            <p className="mt-2 text-lg text-cosmic-blue-200">{getScoreMessage()}</p>
-          </div>
+                <p className="text-lg text-cosmic-blue-200">{getScoreMessage()}</p>
+              </motion.div>
         </motion.div>
 
+            {/* Stats Grid */}
+            <AnimatePresence>
         {showStats && (
           <motion.div
-            className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+                  className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
           >
+                  {[
+                    { label: 'WPM', value: stats.wpm },
+                    { label: 'Accuracy', value: `${stats.accuracy}%` },
+                    { label: 'Words', value: stats.wordsTyped },
+                    { label: 'Streak', value: stats.longestStreak }
+                  ].map((stat, index) => (
             <motion.div
-              className="text-center cosmic-panel bg-opacity-50 p-4"
+                      key={stat.label}
+                      className="cosmic-panel p-4 text-center"
               variants={statItemVariants}
-            >
-              <p className="text-sm uppercase tracking-wider text-cosmic-blue-400 font-futuristic">WPM</p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.wpm}</p>
+                      initial="hidden"
+                      animate="visible"
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <p className="text-sm uppercase tracking-wider text-cosmic-blue-400 font-futuristic mb-1">
+                        {stat.label}
+                      </p>
+                      <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+                        {stat.value}
+                      </p>
             </motion.div>
+                  ))}
+            </motion.div>
+              )}
+            </AnimatePresence>
 
+            {/* Wallet and Buttons Section */}
             <motion.div
-              className="text-center cosmic-panel bg-opacity-50 p-4"
-              variants={statItemVariants}
-            >
-              <p className="text-sm uppercase tracking-wider text-cosmic-blue-400 font-futuristic">Accuracy</p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.accuracy}%</p>
-            </motion.div>
-
-            <motion.div
-              className="text-center cosmic-panel bg-opacity-50 p-4"
-              variants={statItemVariants}
-            >
-              <p className="text-sm uppercase tracking-wider text-cosmic-blue-400 font-futuristic">Words</p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.wordsTyped}</p>
-            </motion.div>
-
-            <motion.div
-              className="text-center cosmic-panel bg-opacity-50 p-4"
-              variants={statItemVariants}
-            >
-              <p className="text-sm uppercase tracking-wider text-cosmic-blue-400 font-futuristic">Streak</p>
-              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.longestStreak}</p>
-            </motion.div>
-          </motion.div>
-        )}
-
-        <motion.div
-          className="mt-6"
-          variants={itemVariants}
+              className="mt-8"
+              variants={itemVariants}
         >
           {!walletConnected ? (
-            <div className="text-center mb-4">
-              <div className="flex justify-center items-center gap-4">
-                <p className="text-base text-cosmic-blue-200">Connect wallet to save score:</p>
+                <div className="text-center mb-6">
+                  <div className="flex justify-center items-center gap-4">
+                    <p className="text-base text-cosmic-blue-200">Connect wallet to save score:</p>
                 <WalletUiDropdown size="md" />
               </div>
             </div>
           ) : (
-            <div className="text-center mb-4">
-              <p className="text-base text-cosmic-blue-200">Score saved to: {displayAddress}</p>
+                <div className="text-center mb-6">
+                  <p className="text-base text-cosmic-blue-200">Score saved to: {displayAddress}</p>
             </div>
           )}
 
-          <div className="flex justify-center gap-4 mt-4">
-            <button
-              className="cosmic-btn px-8 py-2.5 text-lg"
+              <div className="flex justify-center gap-4">
+                <motion.button
+                  className="cosmic-btn px-8 py-3 text-lg"
               onClick={onRestart}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
             >
               Play Again
-            </button>
+                </motion.button>
 
-            <button
-              className="px-8 py-2.5 rounded-md bg-slate-800 text-teal-100 hover:bg-slate-700 transition-colors text-lg"
+                <motion.button
+                  className="px-8 py-3 rounded-md bg-slate-800 text-teal-100 hover:bg-slate-700 transition-colors text-lg"
               onClick={onExit}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
             >
               Return to Menu
-            </button>
+                </motion.button>
           </div>
         </motion.div>
       </motion.div>
     </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

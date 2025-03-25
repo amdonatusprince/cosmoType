@@ -33,7 +33,7 @@ const LeaderboardPage = () => {
       // Filter by game mode if needed
       const filteredData = filter === 'all'
         ? mockLeaderboard
-        : mockLeaderboard.filter(entry => entry.gameMode === filter);
+        : []; // Return empty array for tranquility and action modes
 
       // Set total pages
       setTotalPages(Math.ceil(filteredData.length / pageSize));
@@ -120,32 +120,38 @@ const LeaderboardPage = () => {
           className="bg-gray-900/50 backdrop-blur-sm rounded-lg overflow-hidden mb-6 sm:mb-8"
           variants={itemVariants}
         >
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left border-b border-gray-700">
-                  <th className="pb-4 px-4 text-sm sm:text-base">Rank</th>
-                  <th className="pb-4 px-4 text-sm sm:text-base">Player</th>
-                  <th className="pb-4 px-4 text-sm sm:text-base">Score</th>
-                  <th className="pb-4 px-4 text-sm sm:text-base hidden sm:table-cell">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(isSearchMode ? searchResults : leaderboardData).map((entry, index) => (
-                  <motion.tr 
-                    key={entry.rank} 
-                    className="border-b border-gray-800"
-                    variants={itemVariants}
-                  >
-                    <td className="py-4 px-4 text-sm sm:text-base">{index + 1}</td>
-                    <td className="py-4 px-4 text-sm sm:text-base">{entry.displayName || shortenAddress(entry.walletAddress)}</td>
-                    <td className="py-4 px-4 text-sm sm:text-base">{entry.score}</td>
-                    <td className="py-4 px-4 text-sm sm:text-base hidden sm:table-cell">{formatDate(entry.timestamp)}</td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {filter !== 'all' ? (
+            <div className="flex justify-center items-center py-12 text-gray-400 text-lg">
+              No record found!
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left border-b border-gray-700">
+                    <th className="pb-4 px-4 text-sm sm:text-base">Rank</th>
+                    <th className="pb-4 px-4 text-sm sm:text-base">Player</th>
+                    <th className="pb-4 px-4 text-sm sm:text-base">Score</th>
+                    <th className="pb-4 px-4 text-sm sm:text-base hidden sm:table-cell">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(isSearchMode ? searchResults : leaderboardData).map((entry, index) => (
+                    <motion.tr 
+                      key={entry.rank} 
+                      className="border-b border-gray-800"
+                      variants={itemVariants}
+                    >
+                      <td className="py-4 px-4 text-sm sm:text-base">{index + 1}</td>
+                      <td className="py-4 px-4 text-sm sm:text-base">{entry.displayName || shortenAddress(entry.walletAddress)}</td>
+                      <td className="py-4 px-4 text-sm sm:text-base">{entry.score}</td>
+                      <td className="py-4 px-4 text-sm sm:text-base hidden sm:table-cell">{formatDate(entry.timestamp)}</td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </motion.div>
 
         {/* Return Home Button */}

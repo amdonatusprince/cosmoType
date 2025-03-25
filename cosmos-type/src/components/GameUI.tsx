@@ -62,7 +62,7 @@ const GameUI: React.FC<GameUIProps> = ({
   }, [score]);
 
   return (
-    <div className="absolute inset-x-0 top-0 z-10 p-2 sm:p-4 pt-16 flex flex-col">
+    <div className="absolute inset-x-0 top-0 z-10 p-2 sm:p-4 flex flex-col">
       {/* Main stats row */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
         {/* Left: Life and difficulty */}
@@ -183,12 +183,85 @@ const GameUI: React.FC<GameUIProps> = ({
         </div>
       </div>
 
-      {/* Current word being typed */}
-      <div className="mt-4 flex justify-center">
-        <div className="h-8 px-4 py-1 rounded-full bg-black/30 backdrop-blur-sm border border-cosmic-blue-500/30 text-center">
-          <span className="font-futuristic text-sm sm:text-base">
-            {currentTypedWord ? currentTypedWord : '...'}
+      {/* Death line indicator with flame effect */}
+      <div className="fixed bottom-[30%] left-0 w-full">
+        {/* Flame/smoke effect */}
+        <div className="absolute inset-x-0 -top-8 h-8 overflow-hidden">
+          <motion.div 
+            className="w-full h-full bg-gradient-to-t from-red-400/0 via-red-300/20 to-orange-200/10"
+            animate={{ 
+              y: [0, -8, 0],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+        
+        {/* Main line */}
+        <div className="relative h-1 bg-red-300/30">
+          <motion.div
+            className="absolute inset-0 bg-red-300"
+            animate={{ opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          
+          {/* Glowing effect */}
+          <div className="absolute inset-0 blur-sm bg-red-300/30" />
+        </div>
+
+        {/* Smoke effect */}
+        <div className="absolute -bottom-8 inset-x-0 h-8 overflow-hidden">
+          <motion.div 
+            className="w-full h-full bg-gradient-to-b from-red-300/10 via-red-200/5 to-transparent"
+            animate={{ 
+              y: [0, 8, 0],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{ 
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Current word being typed - Moved well below death line */}
+      <div className="fixed left-1/2 bottom-[15%] -translate-x-1/2 flex flex-col items-center justify-center space-y-4 pointer-events-none">
+        {/* Active word indicator */}
+        <div className="h-16 px-8 py-3 rounded-full bg-black/50 backdrop-blur-sm border-2 border-cosmic-blue-500/50 text-center transform transition-all duration-200">
+          <span className="font-futuristic text-xl sm:text-2xl">
+            {currentTypedWord ? (
+              <>
+                <span className="text-green-400">{currentTypedWord}</span>
+                <motion.span 
+                  className="text-cosmic-blue-400 opacity-75 ml-1"
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  |
+                </motion.span>
+              </>
+            ) : (
+              <span className="text-gray-400 opacity-75">Type to shoot...</span>
+            )}
           </span>
+        </div>
+        
+        {/* Typing guide - Below typing box */}
+        <div className="text-center bg-black/30 px-4 py-2 rounded-lg backdrop-blur-sm">
+          <motion.div
+            className="text-sm sm:text-base text-cosmic-blue-300 font-futuristic"
+            initial={{ opacity: 0.6 }}
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            Press ESC to pause • Type words before they reach the line
+          </motion.div>
         </div>
       </div>
 

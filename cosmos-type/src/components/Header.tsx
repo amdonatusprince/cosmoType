@@ -9,7 +9,7 @@ const Header = () => {
       <div className="flex flex-col sm:flex-row items-end sm:items-center justify-end space-y-2 sm:space-y-0 sm:space-x-4 bg-black/20 backdrop-blur-sm rounded-lg p-2">
         {/* Navigation Menu */}
         <nav className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-          <Link
+          {/* <Link
             to="/tutorial"
             className={`nav-link font-futuristic text-sm sm:text-base lg:text-lg px-3 sm:px-4 py-1.5 sm:py-2 w-full sm:w-auto text-right sm:text-left
               ${location.pathname === '/tutorial'
@@ -19,7 +19,7 @@ const Header = () => {
               rounded-md border border-gray-700 hover:border-purple-500/50`}
           >
             Tutorial
-          </Link>
+          </Link> */}
           <Link
             to="/settings"
             className={`nav-link font-futuristic text-sm sm:text-base lg:text-lg px-3 sm:px-4 py-1.5 sm:py-2 w-full sm:w-auto text-right sm:text-left

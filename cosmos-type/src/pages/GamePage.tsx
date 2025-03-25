@@ -118,7 +118,7 @@ const GamePage = () => {
   }, [difficulty, setLife, setScore, timeRemaining]);
 
   // Handle word miss
-  const handleWordMiss = useCallback(() => {
+  const handleWordMiss = useCallback((word: Word) => {
     if (difficulty === 'zen') return;
 
     // Play sound effect
@@ -170,7 +170,8 @@ const GamePage = () => {
     words,
     currentTypedWord,
     activeWordId,
-    completionStreak
+    completionStreak,
+    setWords
   } = useFallingWords(
     mode,
     difficulty,
@@ -224,6 +225,7 @@ const GamePage = () => {
     setScore(0);
     setLife(100);
     setSessionStartTime(Date.now());
+    setWords([]); // Clear all falling words
 
     // Reset timer if not zen mode
     if (difficulty !== 'zen') {
@@ -239,7 +241,7 @@ const GamePage = () => {
 
     // Play game start sound
     playSound('gameStart');
-  }, [difficulty, playSound, resetStats, setLife, setScore]);
+  }, [difficulty, playSound, resetStats, setLife, setScore, setWords]);
 
   // Handle exiting to menu
   const handleExit = useCallback(() => {
@@ -292,19 +294,56 @@ const GamePage = () => {
     // Check if the character matches the next character in the word
     const nextChar = activeWord.remaining[0]?.toLowerCase();
     if (char === nextChar) {
+      // Play keypress sound
+      playSound('keypress');
+
       // Update the word's remaining and completed text
-      activeWord.remaining = activeWord.remaining.slice(1);
-      activeWord.completed = activeWord.text.slice(0, activeWord.text.length - activeWord.remaining.length);
+      const newRemaining = activeWord.remaining.slice(1);
+      const newCompleted = activeWord.text.slice(0, activeWord.text.length - newRemaining.length);
+      
+      // Update the word in the words array
+      setWords(prevWords => 
+        prevWords.map(word => 
+          word.id === activeWordId 
+            ? { 
+                ...word, 
+                remaining: newRemaining, 
+                completed: newCompleted,
+                state: newRemaining.length === 0 ? 'completed' : 'targeted'
+              }
+            : word
+        )
+      );
       
       // If word is completed
-      if (activeWord.remaining.length === 0) {
+      if (newRemaining.length === 0) {
         handleWordComplete(activeWord);
       }
     } else {
       // Handle mistype
-      handleWordMiss();
+      handleWordMiss(activeWord);
+      
+      // Update word state to show miss
+      setWords(prevWords =>
+        prevWords.map(word =>
+          word.id === activeWordId
+            ? { ...word, state: 'missed' }
+            : word
+        )
+      );
+
+      // Reset word state after a short delay
+      setTimeout(() => {
+        setWords(prevWords =>
+          prevWords.map(word =>
+            word.id === activeWordId
+              ? { ...word, state: 'falling' }
+              : word
+          )
+        );
+      }, 150);
     }
-  }, [isActive, isPaused, isGameOver, words, activeWordId, handleWordComplete, handleWordMiss]);
+  }, [isActive, isPaused, isGameOver, words, activeWordId, handleWordComplete, handleWordMiss, playSound]);
 
   // Handle key press
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
@@ -364,8 +403,8 @@ const GamePage = () => {
         onPause={handlePause}
       />
 
-      {/* Words container */}
-      <div className="relative h-full w-full">
+      {/* Words container - Adjusted to match new layout */}
+      <div className="relative h-[75vh] w-full">
         {words.map((word) => (
           <FallingWord
             key={word.id}
@@ -376,11 +415,12 @@ const GamePage = () => {
         ))}
       </div>
 
-      {/* Mobile input (hidden on desktop) */}
+      {/* Mobile input - Styled for better visibility */}
       <input
         type="text"
-        className="fixed bottom-0 left-0 w-full h-12 bg-transparent text-transparent border-none focus:outline-none md:hidden"
+        className="fixed bottom-24 left-1/2 -translate-x-1/2 w-64 h-12 bg-black/30 backdrop-blur-sm rounded-full text-center text-white border border-cosmic-blue-500/30 focus:outline-none focus:border-cosmic-blue-500 md:hidden"
         onChange={handleMobileInput}
+        placeholder="Type to shoot..."
         autoComplete="off"
         autoCorrect="off"
         spellCheck="false"

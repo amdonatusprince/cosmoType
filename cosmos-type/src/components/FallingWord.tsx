@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { FallingWord as FallingWordType } from '../hooks/useFallingWords';
 import { GameMode } from '../contexts/GameContext';
 
@@ -12,29 +11,17 @@ interface FallingWordProps {
 const FallingWord = ({ word, isActive, gameMode }: FallingWordProps) => {
   const wordRef = useRef<HTMLDivElement>(null);
 
-  // Calculate text shadow based on status and mode
+  // Get text shadow based on word state
   const getTextShadow = () => {
+    if (word.state === 'completed') {
+      return '0 0 10px rgba(84, 255, 174, 0.8), 0 0 20px rgba(84, 255, 174, 0.4)';
+    }
+    if (word.state === 'missed') {
+      return '0 0 10px rgba(255, 84, 84, 0.8), 0 0 20px rgba(255, 84, 84, 0.4)';
+    }
     if (isActive) {
-      return gameMode === 'tranquility'
-        ? '0 0 10px rgba(84, 255, 174, 0.8), 0 0 20px rgba(84, 255, 174, 0.4)'
-        : '0 0 10px rgba(255, 84, 84, 0.8), 0 0 20px rgba(255, 84, 84, 0.4)';
+      return '0 0 10px rgba(84, 255, 174, 0.8), 0 0 20px rgba(84, 255, 174, 0.4)';
     }
-
-    if (word.specialEffect) {
-      switch (word.specialEffect) {
-        case 'powerUp':
-          return '0 0 10px rgba(0, 255, 153, 0.8), 0 0 20px rgba(0, 255, 153, 0.4)';
-        case 'multiplier':
-          return '0 0 10px rgba(255, 204, 0, 0.8), 0 0 20px rgba(255, 204, 0, 0.4)';
-        case 'bomb':
-          return '0 0 10px rgba(255, 51, 51, 0.8), 0 0 20px rgba(255, 51, 51, 0.4)';
-        case 'freeze':
-          return '0 0 10px rgba(51, 204, 255, 0.8), 0 0 20px rgba(51, 204, 255, 0.4)';
-        default:
-          return '0 0 5px rgba(255, 255, 255, 0.2)';
-      }
-    }
-
     return '0 0 5px rgba(255, 255, 255, 0.2)';
   };
 
@@ -87,32 +74,31 @@ const FallingWord = ({ word, isActive, gameMode }: FallingWordProps) => {
   // Different animation variants for different word states
   const variants = {
     falling: {
-      y: `${word.y}%`,
+      y: [`-120%`, `${word.y}%`],
       x: `${word.x}%`,
       rotate: word.rotation,
       scale: word.scale,
-      opacity: 1,
+      opacity: [0, 1],
       transition: {
-        type: 'tween',
-        ease: 'linear',
-        duration: 0.1
+        y: { duration: 3, ease: 'linear' },
+        opacity: { duration: 0.3 }
       }
     },
     completed: {
-      y: word.y - 5 + '%',
+      y: [word.y + '%', (word.y - 20) + '%'],
       x: word.x + '%',
-      rotate: 0,
-      scale: [word.scale, word.scale * 1.2, 0],
-      opacity: [1, 1, 0],
+      rotate: [0, 0],
+      scale: [word.scale, word.scale * 2],
+      opacity: [1, 0],
       transition: {
         duration: 0.5,
-        times: [0, 0.7, 1],
         ease: 'easeOut'
       }
     },
     missed: {
-      y: '105%',
-      opacity: 0,
+      y: '120%',
+      scale: [1, 0.8],
+      opacity: [1, 0],
       transition: {
         duration: 0.3,
         ease: 'easeIn'
@@ -122,75 +108,138 @@ const FallingWord = ({ word, isActive, gameMode }: FallingWordProps) => {
       y: `${word.y}%`,
       x: `${word.x}%`,
       rotate: 0,
-      scale: word.scale * 1.1,
+      scale: word.scale * 1.2,
       opacity: 1,
       transition: {
         type: 'spring',
-        stiffness: 200,
-        damping: 15
+        stiffness: 400,
+        damping: 25
       }
     }
   };
 
-  // Special particle effect for word completion
+  // Enhanced particle effect for word completion
   const animationVariants = {
     completed: {
       opacity: [1, 0],
       scale: [1, 2],
-      transition: { duration: 0.5 }
+      transition: { duration: 0.8 }
     }
   };
 
   return (
-    <motion.div
+    <div
       ref={wordRef}
       className="absolute font-futuristic select-none"
-      initial="falling"
-      animate={word.state}
-      variants={variants}
+      style={{
+        left: `${word.x}%`,
+        top: `${word.y}%`,
+        transform: `scale(${isActive ? 1.1 : 1})`,
+        transition: 'all 0.1s ease-out',
+        filter: isActive ? 'none' : `blur(${Math.min(2, word.speed * 1.2)}px)`,
+      }}
     >
-      {/* Completed particles effect */}
-      {word.state === 'completed' && (
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          initial={{ opacity: 1, scale: 1 }}
-          animate="completed"
-          variants={animationVariants}
-        >
-          <div className="w-full h-full bg-white rounded-full blur-xl" />
-        </motion.div>
+      {/* Targeting line when word is active */}
+      {isActive && (
+        <div
+          className="absolute left-1/2 bottom-0 w-1 bg-gradient-to-t from-transparent via-cosmic-blue-500 to-cosmic-blue-300"
+          style={{
+            height: '70vh',
+            transform: 'translateX(-50%)',
+            animation: 'pulse 1.5s infinite'
+          }}
+        />
       )}
 
-      {/* Special effect badge */}
-      {getSpecialBadge()}
-
-      {/* Word text */}
+      {/* Word container with glow effect */}
       <div
-        className={`whitespace-nowrap transition-all duration-100 ${
-          isActive ? 'font-semibold' : 'font-normal'
+        className={`relative px-3 py-1 rounded-lg transition-all duration-200 ${
+          isActive ? 'bg-black/40 backdrop-blur-sm' : ''
+        }`}
+      >
+        {/* Success flash effect */}
+        {word.state === 'completed' && (
+          <div
+            className="absolute inset-0 rounded-lg bg-green-500"
+            style={{
+              animation: 'flash 0.3s ease-out'
+            }}
+          />
+        )}
+
+        {/* Error flash effect */}
+        {word.state === 'missed' && (
+          <div
+            className="absolute inset-0 rounded-lg bg-red-500"
+            style={{
+              animation: 'flash 0.3s ease-out'
+            }}
+          />
+        )}
+
+        {/* Word text */}
+        <div
+          className={`relative whitespace-nowrap transition-all duration-100 ${
+            isActive ? 'font-bold' : 'font-normal'
         }`}
         style={{
           textShadow: getTextShadow(),
+            transform: isActive ? 'scale(1.2)' : 'scale(1)',
+            transition: 'all 0.2s ease-out'
         }}
       >
         {/* Completed part */}
-        <span
-          className={`text-${gameMode === 'tranquility' ? 'teal' : 'red'}-300`}
-        >
+          <span className="text-green-400">
           {word.completed}
         </span>
 
         {/* Remaining part */}
         <span
           className={`
-            ${isActive ? 'opacity-90' : 'opacity-60'}
+              ${isActive ? 'opacity-100' : 'opacity-80'}
             ${word.specialEffect ? `text-${word.color}` : 'text-white'}
           `}
         >
           {word.remaining}
         </span>
+
+          {/* Active word indicator */}
+          {isActive && (
+            <span
+              className="ml-1 inline-block text-cosmic-blue-400"
+              style={{
+                animation: 'blink 0.8s infinite'
+              }}
+            >
+              ▸
+            </span>
+          )}
+        </div>
       </div>
-    </motion.div>
+
+      {/* Particle effects for completed words */}
+      {word.state === 'completed' && (
+        <div
+          className="absolute inset-0"
+        >
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-green-400"
+              style={{
+                top: '50%',
+                left: '50%',
+                transform: `translate(-50%, -50%) scale(${Math.sin(i * Math.PI / 6) * 0.5 + 0.75})`,
+                opacity: Math.sin(i * Math.PI / 6) * 0.5 + 0.5
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Special effect badge */}
+      {getSpecialBadge()}
+    </div>
   );
 };
 

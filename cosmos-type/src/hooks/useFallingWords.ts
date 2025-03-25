@@ -161,7 +161,6 @@ export const useFallingWords = (
   useEffect(() => {
     if (!isActive || isPaused) return;
 
-    const frameRate = 1000 / 60; // Target 60 FPS
     const moveInterval = setInterval(() => {
       setWords(prevWords => {
         // Move each word down
@@ -170,7 +169,7 @@ export const useFallingWords = (
           if (word.state === 'completed') return word;
 
           // Calculate new position based on speed
-          const newY = word.y + word.speed * (frameRate / 16); // Normalize for frame rate
+          const newY = word.y + word.speed;
 
           // Check if the word reached the bottom
           const reachedBottom = newY >= 95;
@@ -196,7 +195,7 @@ export const useFallingWords = (
           return now - word.completedAt < 1000;
         });
       });
-    }, frameRate);
+    }, 50); // Update positions every 50ms for smoother animation
 
     return () => clearInterval(moveInterval);
   }, [isActive, isPaused, onWordMiss]);
@@ -341,6 +340,7 @@ export const useFallingWords = (
     words,
     currentTypedWord,
     activeWordId,
-    completionStreak
+    completionStreak,
+    setWords
   };
 };
